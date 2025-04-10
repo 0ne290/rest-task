@@ -1,0 +1,240 @@
+basePath: /
+definitions:
+  entities.Status:
+    enum:
+    - new
+    - in_progress
+    - done
+    type: string
+    x-enum-varnames:
+    - statusNew
+    - statusInProgress
+    - statusDone
+  entities.TaskView:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      status:
+        $ref: '#/definitions/entities.Status'
+      title:
+        type: string
+      updatedAt:
+        type: string
+      uuid:
+        type: string
+    type: object
+  taskService.CreateRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      userUuid:
+        type: string
+    type: object
+  taskService.CreateResponse:
+    properties:
+      uuid:
+        type: string
+    type: object
+  taskService.DeleteResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  taskService.GetAllResponse:
+    properties:
+      tasks:
+        items:
+          $ref: '#/definitions/entities.TaskView'
+        type: array
+    type: object
+  taskService.GetByUuidResponse:
+    properties:
+      task:
+        $ref: '#/definitions/entities.TaskView'
+    type: object
+  taskService.UpdateResponse:
+    properties:
+      status:
+        $ref: '#/definitions/entities.Status'
+    type: object
+  web.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  web.Error500:
+    properties:
+      message:
+        type: string
+      requestUrl:
+        type: string
+      requestUuid:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Task CRUD
+  title: Task REST API
+  version: "1.0"
+paths:
+  /v1/tasks:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/taskService.GetAllResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Error500'
+      summary: Get all user tasks. JWT authentication with claim "userUuid" is required
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: CreateRequest
+        in: body
+        name: createRequest
+        required: true
+        schema:
+          $ref: '#/definitions/taskService.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/taskService.CreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Error500'
+      summary: Create a new user task with status "new". JWT authentication with claim
+        "userUuid" is required
+  /v1/tasks/{uuid}:
+    delete:
+      parameters:
+      - description: uuid
+        format: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/taskService.DeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Error500'
+      summary: Delete a user task by UUID. JWT authentication with claim "userUuid"
+        is required
+    get:
+      parameters:
+      - description: uuid
+        format: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/taskService.GetByUuidResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Error500'
+      summary: Get user task by ID. JWT authentication with claim "userUuid" is required
+    put:
+      description: 'Transitions of state machine: new -> in_progress -> done'
+      parameters:
+      - description: uuid
+        format: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/taskService.UpdateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Error500'
+      summary: Moves the user task to the next status. JWT authentication with claim
+        "userUuid" is required
+swagger: "2.0"
