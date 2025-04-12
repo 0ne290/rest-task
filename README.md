@@ -19,7 +19,8 @@ DB_POOL_MAX_CONNS=10
 DB_POOL_MAX_CONN_LIFETIME=300s
 DB_POOL_MAX_CONN_IDLE_TIME=150s
 ```
-2. Выполните команду docker compose up.
+2. Убедиться, что существует пустой Docker Volume с именем "go-microservices-app-db-data".
+3. Выполните команду docker compose up.
 
 ## Приложение запустится по адресу http://localhost:8080. Спецификацию можно посмотреть по адресу http://localhost:8080/swagger.
 
